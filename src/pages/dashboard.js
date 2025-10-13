@@ -1,31 +1,38 @@
-import DashboardSidebar from "./components/DashboardSidebar";
-import DashboardHeader from "./components/DashboardHeader";
-import OverviewCard from "./components/OverviewCard";
-import ChartExpense from "./components/ChartExpense";
-import ServiceList from "./components/ServiceList";
+import Header from "../components/Nav";
+import CityHighlight from "../components/CityHighlight";
+import FilterBar from "../components/FilterBar";
+import InsightSection from "../components/InsightSection";
+import PropertyShowcase from "../components/PropertyShowcase";
+import AIBubble from "../components/AIBubble";
 
-export default function Dashboard() {
+export default function ExplorePage() {
   return (
-    <div className="flex min-h-screen bg-brand-950 text-white">
-      <DashboardSidebar />
-      <div className="flex-1 flex flex-col">
-        <DashboardHeader />
+    <div className="min-h-screen flex flex-col bg-brand-950 text-white">
+      {/* 🔝 Header utama */}
+      <Header />
 
-        <main className="flex-1 p-6 space-y-8 overflow-y-auto">
-          <h2 className="text-2xl font-bold">Selamat Datang, Andi 👋</h2>
+      {/* 🎯 Hero / Highlight kota */}
+      <CityHighlight />
 
-          <div className="grid gap-6 md:grid-cols-3">
-            <OverviewCard title="Total Pengeluaran" value="Rp 2.450.000" desc="bulan ini" />
-            <OverviewCard title="Status Kos" value="Kontrak aktif" desc="sampai 30 Des 2025" />
-            <OverviewCard title="Laundry terakhir" value="2 hari lalu" desc="Rp 35.000" />
-          </div>
+      {/* 🧭 Konten utama */}
+      <main className="flex-1 overflow-y-auto space-y-16 py-12 px-6 md:px-12">
+        {/* 🏙️ Section 1 – Insight & info kota */}
+        <InsightSection />
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <ChartExpense />
-            <ServiceList />
-          </div>
-        </main>
-      </div>
+        {/* 🏠 Section 2 – Showcase properti */}
+        <PropertyShowcase />
+
+        {/* 🤖 Section 3 – AI Assistant */}
+        <div className="text-center mt-20">
+          <h2 className="text-2xl font-semibold mb-3">
+            Masih bingung mau tinggal di mana?
+          </h2>
+          <p className="text-gray-300 mb-6">
+            Coba ngobrol dengan <span className="text-brand-400 font-semibold">YUKA</span> — asisten AI kamu di MerantauYuk.
+          </p>
+          <AIBubble />
+        </div>
+      </main>
     </div>
   );
 }
