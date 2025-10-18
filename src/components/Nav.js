@@ -17,15 +17,11 @@ export default function Nav() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
       if (currentScrollY > lastScrollY && currentScrollY > 80) {
-        // Scroll ke bawah -> sembunyikan
         setVisible(false);
       } else {
-        // Scroll ke atas -> tampilkan
         setVisible(true);
       }
-
       setLastScrollY(currentScrollY);
     };
 
@@ -35,22 +31,38 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 border-b backdrop-blur transition-transform duration-300 ${
-        visible ? "translate-y-0" : "-translate-y-full"
+      className={`fixed top-0 left-0 w-full z-50 border-b backdrop-blur-lg transition-all duration-500 ${
+        visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
       style={{
-        borderColor: "rgba(255,255,255,0.1)",
-        backgroundColor: "rgba(12, 7, 23, 0.7)", // ungu transparan
+        background: "rgba(255, 255, 255, 0.7)", // putih transparan lembut
+        borderColor: "rgba(139, 92, 246, 0.25)", // #8b5cf6 transparan
+        boxShadow: "0 4px 25px rgba(139, 92, 246, 0.15)", // soft glow ungu
       }}
     >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         {/* 🔹 Logo */}
         <a href="#home" className="flex items-center gap-3">
           <div className="flex items-center">
             <img
               src="/logo.png"
               alt="MerantauYuk Logo"
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain transition-all duration-300 drop-shadow-md"
+              style={{
+                // 🎨 Ubah logo ke warna brand #8b5cf6
+                filter:
+                  "brightness(0) saturate(100%) invert(45%) sepia(100%) saturate(800%) hue-rotate(222deg) brightness(100%) contrast(105%)",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.filter =
+                  "brightness(0) saturate(100%) invert(45%) sepia(100%) saturate(900%) hue-rotate(222deg) brightness(120%) contrast(110%)";
+                e.currentTarget.style.transform = "scale(1.05)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.filter =
+                  "brightness(0) saturate(100%) invert(45%) sepia(100%) saturate(800%) hue-rotate(222deg) brightness(100%) contrast(105%)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
             />
           </div>
         </a>
@@ -61,33 +73,33 @@ export default function Nav() {
             <a
               key={id}
               href={`#${id}`}
-              className="text-sm transition-colors duration-200"
+              className="text-sm font-medium transition-colors duration-200"
               style={{
-                color: "rgba(255,255,255,0.8)",
+                color: "#4b5563", // abu lembut
               }}
-              onMouseOver={(e) => (e.currentTarget.style.color = "#ffffff")}
-              onMouseOut={(e) =>
-                (e.currentTarget.style.color = "rgba(255,255,255,0.8)")
-              }
+              onMouseOver={(e) => (e.currentTarget.style.color = "#8b5cf6")}
+              onMouseOut={(e) => (e.currentTarget.style.color = "#4b5563")}
             >
               {label}
             </a>
           ))}
 
-          {/* 🔹 Tombol CTA */}
+          {/* 🔹 Tombol CTA brand #8b5cf6 */}
           <a
             href="#cta"
             className="rounded-full text-sm font-semibold text-white px-5 py-2 shadow-md transition-all duration-300"
             style={{
-              backgroundImage:
-                "linear-gradient(to right, #d946ef, #7c1fbf)", // ungu gradasi
-              boxShadow: "0 0 40px rgba(217,70,239,0.25)",
+              background:
+                "linear-gradient(to right, #a78bfa, #8b5cf6, #7c3aed)", // gradasi tone ungu tajam
+              boxShadow: "0 0 20px rgba(139, 92, 246, 0.35)",
             }}
             onMouseOver={(e) =>
-              (e.currentTarget.style.transform = "translateY(-2px)")
+              (e.currentTarget.style.background =
+                "linear-gradient(to right, #c4b5fd, #8b5cf6, #6d28d9)")
             }
             onMouseOut={(e) =>
-              (e.currentTarget.style.transform = "translateY(0)")
+              (e.currentTarget.style.background =
+                "linear-gradient(to right, #a78bfa, #8b5cf6, #7c3aed)")
             }
           >
             Mulai Sekarang
