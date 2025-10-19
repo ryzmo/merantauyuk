@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, Compass, Sparkles } from "lucide-react";
+import { MapPin, Compass, Sparkles, Luggage, Plane } from "lucide-react";
 
 export default function CityHighlight({
   city = "Kota Tujuanmu",
@@ -23,7 +23,7 @@ export default function CityHighlight({
         }}
       />
 
-      {/* 🌈 Overlay pastel vivid */}
+            {/* 🌈 Overlay pastel vivid */}
       <div
         className="absolute inset-0 z-[1]"
         style={{
@@ -42,8 +42,32 @@ export default function CityHighlight({
         }}
       />
 
-      {/* 🌸 Elemen Partikel bergerak (lembut, interaktif) */}
-      <div className="absolute inset-0 overflow-hidden z-[3]">
+
+      {/* ☁️ Layer Awan Halus */}
+      <motion.div
+        className="absolute inset-0 z-[2] pointer-events-none"
+        style={{
+          backgroundImage: "url('/clouds.svg')",
+          backgroundSize: "cover",
+          opacity: 0.15,
+        }}
+        animate={{ x: ["0%", "10%", "0%"] }}
+        transition={{ duration: 40, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* ✨ Glow Aura di Tengah */}
+      <motion.div
+        className="absolute z-[3] w-72 h-72 rounded-full blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(192,132,252,0.45) 0%, transparent 70%)",
+        }}
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* 🌸 Elemen Partikel & Ikon Bergerak */}
+      <div className="absolute inset-0 overflow-hidden z-[4]">
         <motion.div
           className="absolute text-[#c084fc]/60"
           initial={{ x: -100, y: 50, opacity: 0 }}
@@ -59,7 +83,6 @@ export default function CityHighlight({
 
         <motion.div
           className="absolute right-20 top-1/3 text-[#a78bfa]/60"
-          initial={{ y: 0 }}
           animate={{ y: [0, -25, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         >
@@ -68,17 +91,54 @@ export default function CityHighlight({
 
         <motion.div
           className="absolute bottom-16 left-16 text-[#8b5cf6]/40"
-          initial={{ y: 0 }}
           animate={{ y: [0, 20, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
         >
           <MapPin size={36} />
         </motion.div>
+
+        {/* 🧳 Ikon Perantau (koper & pesawat) */}
+        <motion.div
+          className="absolute bottom-24 right-20 text-[#c084fc]/50"
+          animate={{ x: [0, 40, 0], y: [0, -10, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Luggage size={32} />
+        </motion.div>
+
+        <motion.div
+          className="absolute top-1/4 left-12 text-[#93c5fd]/50"
+          animate={{ x: [0, 60, 0], y: [0, -15, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Plane size={36} />
+        </motion.div>
+
+        {/* 🌟 Particle shimmer */}
+        {[...Array(10)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute z-[4] w-2 h-2 rounded-full bg-[#c084fc]/40"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              opacity: [0.2, 0.7, 0.2],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
       {/* 🌼 Konten utama */}
       <motion.div
-        className="relative z-[5] text-center px-6"
+        className="relative z-[6] text-center px-6"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
@@ -97,13 +157,23 @@ export default function CityHighlight({
         </motion.h1>
 
         <p
-          className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed"
-          style={{
-            color: "#4b5563",
-          }}
+          className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-gray-600"
         >
           {description}
         </p>
+
+        {/* 🧭 Quick Facts */}
+        <div className="mt-6 flex justify-center gap-6 text-sm text-gray-600">
+          <div className="flex items-center gap-1">
+            <MapPin size={16} /> Dekat Kampus
+          </div>
+          <div className="flex items-center gap-1">
+            <Compass size={16} /> Akses Mudah
+          </div>
+          <div className="flex items-center gap-1">
+            <Sparkles size={16} /> Banyak Kos Murah
+          </div>
+        </div>
 
         {/* 🌷 CTA Button */}
         <motion.button
@@ -134,7 +204,7 @@ export default function CityHighlight({
 
       {/* 🕊️ Scroll indicator */}
       <motion.div
-        className="absolute bottom-10 flex flex-col items-center z-[5]"
+        className="absolute bottom-10 flex flex-col items-center z-[6]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 1.5 }}
