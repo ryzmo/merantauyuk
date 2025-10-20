@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Nav() {
   const [visible, setVisible] = useState(true);
@@ -7,12 +8,13 @@ export default function Nav() {
 
   // 🔹 Tambah item "About"
   const items = [
-    ["Home", "/"],
-    ["Feature", "fitur"],
-    ["Survey", "/survei"],
-    ["Roadmap", "roadmap"],
-    ["Contact Us", "contact-us"],
-    ["About", "/about"], // ✅ new link
+    ["Beranda", "/"],
+    ["Kos", "/property"],
+    ["Survei", "/survei"],
+    ["Laundry", "/laundry"],
+    ["Marketplace", "/marketplace"],
+    ["Bantuan", "/bantuan"],
+    ["Tentang", "/tentang"], // ✅ new link
   ];
 
   useEffect(() => {
@@ -43,7 +45,7 @@ export default function Nav() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         {/* 🔹 Logo */}
-        <a href="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <div className="flex items-center">
             <img
               src="/logo.png"
@@ -65,7 +67,7 @@ export default function Nav() {
               }}
             />
           </div>
-        </a>
+        </Link>
 
         {/* 🔹 Menu items */}
         <div className="hidden md:flex items-center gap-6">
@@ -103,7 +105,7 @@ export default function Nav() {
                 "linear-gradient(to right, #a78bfa, #8b5cf6, #7c3aed)")
             }
           >
-            Mulai Sekarang
+            Login
           </a>
         </div>
       </nav>
