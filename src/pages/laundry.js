@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { MapPin, Clock, Shirt, DollarSign, Search, SlidersHorizontal } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
+import Link from "next/link";
 
 export default function LaundryPage() {
   const [filter, setFilter] = useState("Semua");
@@ -198,11 +199,11 @@ export default function LaundryPage() {
                       className="w-full h-56 object-cover"
                     />
 
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                      <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
-                        Lihat Detail
-                      </button>
-                    </div>
+                    <Link href={`/laundry/${item.name.toLowerCase().replace(/\s+/g, "-")}`}>
+  <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
+    Lihat Detail
+  </button>
+</Link>
 
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
                       <h3 className="text-white text-lg font-semibold drop-shadow-sm">

@@ -12,53 +12,34 @@ import {
   CheckCircle,
   Star,
   MessageCircle,
-  Camera,
   ShieldCheck,
-  Navigation,
+  Phone,
+  Send,
 } from "lucide-react";
 import { useRouter } from "next/router";
 
-
-// 🗺️ Dynamic import (biar aman di SSR)
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const Marker = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Marker),
-  { ssr: false }
-);
-const Popup = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Popup),
-  { ssr: false }
-);
+// 🗺️ Dynamic imports (agar aman di SSR)
+const MapContainer = dynamic(() => import("react-leaflet").then(m => m.MapContainer), { ssr: false });
+const TileLayer = dynamic(() => import("react-leaflet").then(m => m.TileLayer), { ssr: false });
+const Marker = dynamic(() => import("react-leaflet").then(m => m.Marker), { ssr: false });
+const Popup = dynamic(() => import("react-leaflet").then(m => m.Popup), { ssr: false });
 
 export default function SurveiPage() {
+  const router = useRouter();
   const [lokasi, setLokasi] = useState("");
   const [catatan, setCatatan] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [progress, setProgress] = useState(0);
   const [found, setFound] = useState(false);
   const [surveyor, setSurveyor] = useState(null);
-  const [userPosition, setUserPosition] = useState([-7.9666, 112.6326]); // default Malang
+  const [userPosition, setUserPosition] = useState([-7.9666, 112.6326]);
   const [surveyorPosition, setSurveyorPosition] = useState(null);
   const [status, setStatus] = useState("menemukan");
 
-  const router = useRouter();
+  useEffect(() => {
+    if (router.query.lokasi) setLokasi(router.query.lokasi);
+  }, [router.query.lokasi]);
 
-useEffect(() => {
-  if (router.query.lokasi) {
-    setLokasi(router.query.lokasi);
-  }
-}, [router.query.lokasi]);
-
-
-
-  // 🔹 Mock surveyors data
   const surveyorsMock = [
     {
       id: 1,
@@ -69,6 +50,7 @@ useEffect(() => {
       pengalaman: "3 tahun",
       foto: "/user1.jpg",
       coords: [-7.956, 112.621],
+      telp: "0812-9999-1234",
     },
     {
       id: 2,
@@ -79,10 +61,11 @@ useEffect(() => {
       pengalaman: "2 tahun",
       foto: "/user2.jpg",
       coords: [-7.958, 112.628],
+      telp: "0813-8888-5678",
     },
   ];
 
-  // 🔹 Ambil lokasi user (GPS)
+  // Ambil lokasi user (GPS)
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -92,12 +75,8 @@ useEffect(() => {
     }
   }, []);
 
-  // 🔹 Handle tombol cari surveyor
   const handleCariSurveyor = () => {
-    if (!lokasi.trim()) {
-      alert("Masukkan lokasi kos atau area survei terlebih dahulu!");
-      return;
-    }
+    if (!lokasi.trim()) return alert("Masukkan lokasi kos atau area survei terlebih dahulu!");
 
     setIsSearching(true);
     setFound(false);
@@ -105,89 +84,85 @@ useEffect(() => {
     setProgress(0);
 
     const timer = setInterval(() => {
-      setProgress((p) => (p < 100 ? p + 10 : 100));
-    }, 300);
+      setProgress((p) => (p < 100 ? p + 8 : 100));
+    }, 250);
 
     setTimeout(() => {
       clearInterval(timer);
-      const randomSurveyor =
-        surveyorsMock[Math.floor(Math.random() * surveyorsMock.length)];
-      setSurveyor(randomSurveyor);
-      setSurveyorPosition(randomSurveyor.coords);
+      const s = surveyorsMock[Math.floor(Math.random() * surveyorsMock.length)];
+      setSurveyor(s);
+      setSurveyorPosition(s.coords);
       setIsSearching(false);
       setFound(true);
     }, 3000);
   };
 
-  // 🔹 Simulasi surveyor bergerak mendekat
+  // Animasi bergerak mendekat
   useEffect(() => {
     if (found && surveyorPosition && userPosition) {
       const interval = setInterval(() => {
         setSurveyorPosition((prev) => {
           if (!prev) return prev;
           const [lat, lng] = prev;
-          const [userLat, userLng] = userPosition;
-
-          const newLat = lat + (userLat - lat) * 0.05;
-          const newLng = lng + (userLng - lng) * 0.05;
-
-          const dist = Math.sqrt(
-            Math.pow(newLat - userLat, 2) + Math.pow(newLng - userLng, 2)
-          );
-
+          const [ulat, ulng] = userPosition;
+          const newLat = lat + (ulat - lat) * 0.05;
+          const newLng = lng + (ulng - lng) * 0.05;
+          const dist = Math.sqrt(Math.pow(newLat - ulat, 2) + Math.pow(newLng - ulng, 2));
           if (dist < 0.0005) {
             clearInterval(interval);
             return userPosition;
           }
           return [newLat, newLng];
         });
-      }, 1200);
-
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [found]);
-  useEffect(() => {
-  if (found) {
-    setStatus("menuju"); // setelah ditemukan
-    setTimeout(() => setStatus("tiba"), 10000); // 10 detik kemudian tiba
-    setTimeout(() => setStatus("selesai"), 20000); // lalu selesai
-  }
-}, [found]);
 
+  useEffect(() => {
+    if (found) {
+      setStatus("menuju");
+      setTimeout(() => setStatus("tiba"), 10000);
+      setTimeout(() => setStatus("selesai"), 20000);
+    }
+  }, [found]);
 
   return (
     <>
       <Navbar />
 
-      {/* HERO */}
-      <section className="relative min-h-[95vh] text-black flex flex-col justify-center items-center text-center bg-gradient-to-b from-[#faf5ff] via-[#f3e8ff] to-[#ede9fe] overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-20 bg-[url('/map-pattern.png')] bg-cover bg-center"
-          style={{ backgroundSize: "120%" }}
+      <section className="relative min-h-screen text-gray-800 bg-gradient-to-b from-[#faf5ff] via-[#f3e8ff] to-[#ede9fe] overflow-hidden flex flex-col items-center">
+        {/* Background dekorasi */}
+        <motion.div
+          className="absolute top-10 left-10 w-64 h-64 bg-[#c084fc]/20 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-transparent to-white/90" />
+        <motion.div
+          className="absolute bottom-10 right-10 w-72 h-72 bg-[#93c5fd]/20 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        />
 
-        {/* CONTENT */}
-        <div className="relative z-10 mt-24 max-w-3xl w-full px-4">
+        <div className="relative z-10 w-full max-w-3xl mt-32 px-5 text-center">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-6xl font-extrabold text-[#8b5cf6] drop-shadow-sm"
+            transition={{ duration: 0.6 }}
+            className="text-5xl font-extrabold text-[#8b5cf6] drop-shadow-sm"
           >
             Survei Kos, Semudah GoRide 🚗
           </motion.h1>
-          <p className="mt-4 text-gray-600 leading-relaxed max-w-xl mx-auto">
-            Masukkan lokasi kos atau apartemen yang ingin kamu survei. Kami akan
-            mencarikan surveyor lokal terbaik yang bisa langsung menuju lokasi.
+          <p className="mt-3 text-gray-600 text-lg">
+            Temukan surveyor lokal terbaik yang bisa langsung ke lokasi kos pilihanmu.
           </p>
 
-          {/* FORM */}
+          {/* Form utama */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-8 bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-[#c084fc]/30 text-left"
+            transition={{ delay: 0.3 }}
+            className="mt-10 bg-white/90 border border-[#c084fc]/30 shadow-xl backdrop-blur-md rounded-2xl p-6 text-left"
           >
             <label className="block mb-4">
               <span className="font-medium text-gray-700 flex items-center gap-2">
@@ -195,10 +170,10 @@ useEffect(() => {
               </span>
               <input
                 type="text"
-                placeholder="Contoh: Kos Putri Anggrek, Lowokwaru"
                 value={lokasi}
                 onChange={(e) => setLokasi(e.target.value)}
-                className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c084fc]"
+                placeholder="Contoh: Kos Putri Anggrek, Lowokwaru"
+                className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#8b5cf6] focus:outline-none"
               />
             </label>
 
@@ -208,22 +183,22 @@ useEffect(() => {
               </span>
               <textarea
                 rows="2"
-                placeholder="Contoh: Tolong ambil video di kamar & dapur."
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
-                className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#c084fc]"
+                placeholder="Contoh: Tolong ambil video di kamar & dapur."
+                className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#8b5cf6] focus:outline-none"
               />
             </label>
 
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
-              onClick={handleCariSurveyor}
               disabled={isSearching}
+              onClick={handleCariSurveyor}
               className={`w-full py-3 font-semibold rounded-xl flex items-center justify-center gap-2 transition-all ${
                 isSearching
-                  ? "bg-gray-300 text-gray-600"
-                  : "bg-gradient-to-r from-[#c084fc] to-[#93c5fd] text-white shadow-md hover:shadow-lg"
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-gradient-to-r from-[#8b5cf6] to-[#93c5fd] text-white shadow-md hover:shadow-lg"
               }`}
             >
               {isSearching ? (
@@ -238,7 +213,7 @@ useEffect(() => {
             </motion.button>
           </motion.div>
 
-          {/* STATE: SEARCHING */}
+          {/* Animasi mencari */}
           <AnimatePresence>
             {isSearching && (
               <motion.div
@@ -249,30 +224,26 @@ useEffect(() => {
                 className="mt-10 flex flex-col items-center text-gray-600"
               >
                 <Loader2 size={52} className="animate-spin text-[#8b5cf6]" />
-                <p className="mt-3 text-lg font-medium">
-                  Mencari surveyor di sekitar {lokasi}...
+                <p className="mt-3 font-medium text-lg">
+                  Mencari surveyor terbaik di sekitar {lokasi}...
                 </p>
                 <div className="w-64 h-2 bg-gray-200 rounded-full mt-3 overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-[#c084fc] to-[#93c5fd]"
+                    className="h-full bg-gradient-to-r from-[#8b5cf6] to-[#93c5fd]"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  Mohon tunggu sebentar... kami sedang mencarikan yang terdekat 🕵️
-                </p>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* STATE: FOUND */}
+          {/* Surveyor ditemukan */}
           <AnimatePresence>
             {found && surveyor && (
               <motion.div
                 key="found"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
                 transition={{ duration: 0.6 }}
                 className="mt-10"
               >
@@ -291,17 +262,17 @@ useEffect(() => {
                         {surveyor.lokasi} • {surveyor.jarak}
                       </p>
                       <div className="flex items-center gap-1 text-[#f9a8d4] text-sm mt-1">
-                        <Star size={14} /> {surveyor.rating}
+                        <Star size={14} /> {surveyor.rating} ⭐
                       </div>
                     </div>
                   </div>
 
-                  {/* MAP - Fokus ke surveyor */}
-                  <div className="overflow-hidden rounded-xl mt-5">
+                  <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm mt-4">
                     <MapContainer
                       center={surveyorPosition || userPosition}
                       zoom={15}
                       scrollWheelZoom={false}
+                      style={{ height: 300 }}
                     >
                       <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -309,9 +280,7 @@ useEffect(() => {
                       />
                       {surveyorPosition && (
                         <Marker position={surveyorPosition}>
-                          <Popup>
-                            🚗 {surveyor.nama} (Surveyor) sedang menuju lokasi
-                          </Popup>
+                          <Popup>🚗 {surveyor.nama} sedang menuju lokasi kamu</Popup>
                         </Marker>
                       )}
                       <Marker position={userPosition}>
@@ -319,26 +288,28 @@ useEffect(() => {
                       </Marker>
                     </MapContainer>
                   </div>
-                  <div className="mt-4 bg-white/90 border border-[#c084fc]/20 rounded-xl p-3 text-center text-sm font-medium text-gray-700">
-  {status === "menuju" && "🚗 Surveyor sedang menuju lokasi kamu"}
-  {status === "tiba" && "📸 Surveyor telah tiba dan sedang melakukan survei"}
-  {status === "selesai" && "✅ Survei selesai, laporan sedang dikirim ke akun kamu"}
-</div>
 
+                  {/* Status */}
+                  <div className="mt-4 text-center text-sm font-medium text-gray-700 bg-[#f9f9ff]/80 border border-[#c084fc]/20 rounded-xl py-2">
+                    {status === "menuju" && "🚗 Surveyor sedang menuju lokasi kamu"}
+                    {status === "tiba" && "📸 Surveyor telah tiba dan sedang melakukan survei"}
+                    {status === "selesai" && "✅ Survei selesai, laporan sedang dikirim ke akun kamu"}
+                  </div>
 
-                  <motion.div
-                    className="flex flex-col sm:flex-row gap-3 mt-6"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <button className="flex-1 py-2 rounded-lg bg-gradient-to-r from-[#8b5cf6] to-[#93c5fd] text-white font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                      <MessageCircle size={16} /> Hubungi Surveyor
-                    </button>
+                  {/* CTA */}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                    <a
+                      href={`https://wa.me/${surveyor.telp.replace(/^0/, "62")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 rounded-lg bg-gradient-to-r from-[#8b5cf6] to-[#93c5fd] text-white font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle size={16} /> Hubungi via WhatsApp
+                    </a>
                     <button className="flex-1 py-2 rounded-lg border border-[#c084fc]/40 text-[#8b5cf6] font-semibold hover:bg-[#f3e8ff]/70 transition flex items-center justify-center gap-2">
                       <CheckCircle size={16} /> Konfirmasi Survei
                     </button>
-                  </motion.div>
+                  </div>
                 </div>
               </motion.div>
             )}
