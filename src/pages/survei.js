@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   Navigation,
 } from "lucide-react";
+import { useRouter } from "next/router";
+
 
 // 🗺️ Dynamic import (biar aman di SSR)
 const MapContainer = dynamic(
@@ -45,6 +47,15 @@ export default function SurveiPage() {
   const [userPosition, setUserPosition] = useState([-7.9666, 112.6326]); // default Malang
   const [surveyorPosition, setSurveyorPosition] = useState(null);
   const [status, setStatus] = useState("menemukan");
+
+  const router = useRouter();
+
+useEffect(() => {
+  if (router.query.lokasi) {
+    setLokasi(router.query.lokasi);
+  }
+}, [router.query.lokasi]);
+
 
 
   // 🔹 Mock surveyors data

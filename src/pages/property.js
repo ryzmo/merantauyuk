@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { MapPin, Bed, Wifi, Droplet, Search, SlidersHorizontal } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
+import Link from "next/link";
+
 
 export default function PropertyPage() {
   const [filter, setFilter] = useState("Semua");
@@ -184,64 +186,70 @@ export default function PropertyPage() {
             </p>
 
             {/* 🏘️ Daftar properti */}
-            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filtered.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.03 }}
-                  viewport={{ once: true }}
-                  className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all"
-                >
-                  <div className="group relative">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-56 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                      <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
-                        Lihat Detail
-                      </button>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
-                      <h3 className="text-white text-lg font-semibold drop-shadow-sm">
-                        {item.name}
-                      </h3>
-                      <p className="text-[#f9a8d4] text-sm font-medium">
-                        Rp {item.price.toLocaleString("id-ID")}/bulan
-                      </p>
-                    </div>
-                  </div>
+            {/* 🏘️ Daftar properti */}
+<div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+  {filtered.map((item, index) => {
+    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
 
-                  <div className="p-5 text-left">
-                    <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                      <MapPin size={16} /> {item.location}
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                      {item.facilities.includes("WiFi") && (
-                        <div className="flex items-center gap-1">
-                          <Wifi size={14} /> WiFi
-                        </div>
-                      )}
-                      {item.facilities.includes("Kamar Mandi Dalam") && (
-                        <div className="flex items-center gap-1">
-                          <Droplet size={14} /> KM Dalam
-                        </div>
-                      )}
-                      {item.facilities.includes("AC") && (
-                        <div className="flex items-center gap-1">
-                          <Bed size={14} /> AC
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+    return (
+      <Link
+        key={index}
+        href={`/property/${slug}`}
+        className="group relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all block"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: index * 0.1 }}
+          whileHover={{ scale: 1.03 }}
+          viewport={{ once: true }}
+          className="h-full"
+        >
+          <div className="relative">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
+              <h3 className="text-white text-lg font-semibold drop-shadow-sm">
+                {item.name}
+              </h3>
+              <p className="text-[#f9a8d4] text-sm font-medium">
+                Rp {item.price.toLocaleString("id-ID")}/bulan
+              </p>
             </div>
+          </div>
+
+          <div className="p-5 text-left">
+            <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
+              <MapPin size={16} /> {item.location}
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+              {item.facilities.includes("WiFi") && (
+                <div className="flex items-center gap-1">
+                  <Wifi size={14} /> WiFi
+                </div>
+              )}
+              {item.facilities.includes("Kamar Mandi Dalam") && (
+                <div className="flex items-center gap-1">
+                  <Droplet size={14} /> KM Dalam
+                </div>
+              )}
+              {item.facilities.includes("AC") && (
+                <div className="flex items-center gap-1">
+                  <Bed size={14} /> AC
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      </Link>
+    );
+  })}
+</div>
+
 
             <p className="mt-12 text-sm text-gray-500">
               Ditemukan {filtered.length} hunian di {city} 💜
