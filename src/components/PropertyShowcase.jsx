@@ -2,55 +2,29 @@
 
 import { motion } from "framer-motion";
 import { MapPin, Bed, Wifi, Droplet } from "lucide-react";
-import { useState } from "react";
-
-const properties = [
-  {
-    name: "Kos Griya Putri Anggrek",
-    price: "Rp 850.000/bulan",
-    location: "Lowokwaru",
-    image: "/malang/kos1.jpg",
-    facilities: ["WiFi", "Kamar Mandi Dalam", "Dapur Bersama"],
-  },
-  {
-    name: "Kost Pak Budi",
-    price: "Rp 1.200.000/bulan",
-    location: "Sukun",
-    image: "/malang/kos2.jpg",
-    facilities: ["WiFi", "Air Panas", "Parkir Motor"],
-  },
-  {
-    name: "Apartemen Soekarno Hatta",
-    price: "Rp 2.800.000/bulan",
-    location: "Soekarno Hatta",
-    image: "/malang/kos3.jpg",
-    facilities: ["AC", "WiFi", "Laundry"],
-  },
-  {
-    name: "Kos Putra Mahasiswa UB",
-    price: "Rp 950.000/bulan",
-    location: "Dinoyo",
-    image: "/malang/kos4.jpg",
-    facilities: ["WiFi", "Kamar Mandi Dalam", "Dapur Bersama"],
-  },
-  {
-    name: "Kos Green Hills",
-    price: "Rp 1.500.000/bulan",
-    location: "Tlogomas",
-    image: "/malang/kos5.jpg",
-    facilities: ["AC", "WiFi", "Laundry"],
-  },
-  {
-    name: "Kos Exclusive Putri Jasmine",
-    price: "Rp 2.200.000/bulan",
-    location: "Blimbing",
-    image: "/malang/kos6.jpg",
-    facilities: ["WiFi", "AC", "Kamar Mandi Dalam"],
-  },
-];
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function PropertyShowcase({ city = "Malang" }) {
+  const [properties, setProperties] = useState([]);
   const [filter, setFilter] = useState("Semua");
+  const [loading, setLoading] = useState(true);
+
+  // 🔄 Fetch data dari API
+  useEffect(() => {
+    async function fetchProperties() {
+      try {
+        const res = await fetch("/api/properties");
+        const data = await res.json();
+        setProperties(data);
+      } catch (error) {
+        console.error("Gagal memuat data properti:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProperties();
+  }, []);
 
   const filtered = properties.filter((p) => {
     if (filter === "Semua") return true;
@@ -61,7 +35,7 @@ export default function PropertyShowcase({ city = "Malang" }) {
 
   return (
     <section className="relative py-24 bg-gradient-to-b from-[#faf5ff]/80 via-white to-[#f3e8ff]/60 overflow-hidden">
-      {/* 🌈 Gradient atas lembut (nyambung ke section sebelumnya) */}
+      {/* 🌈 Gradient atas lembut */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white via-white/80 to-transparent pointer-events-none z-[2]" />
 
       {/* 🌸 Background Glow Animasi */}
@@ -95,17 +69,18 @@ export default function PropertyShowcase({ city = "Malang" }) {
           Temukan tempat tinggal sesuai gaya hidupmu.
         </p>
 
-        {/* ✨ Tagline highlight */}
         <p className="mt-4 text-[#8b5cf6] font-medium tracking-wide">
           Pilihan kos & apartemen paling populer bulan ini ✨
         </p>
 
         {/* 📊 Statistik mini */}
-        <div className="mt-8 flex justify-center gap-6 text-sm text-gray-600">
-          <div>🏘️ <strong>{properties.length}</strong> pilihan hunian</div>
-          <div>💰 Mulai dari <strong>Rp 850rb</strong>/bulan</div>
-          <div>📍 Area populer: <strong>Lowokwaru, Dinoyo</strong></div>
-        </div>
+        {!loading && properties.length > 0 && (
+          <div className="mt-8 flex justify-center gap-6 text-sm text-gray-600">
+            <div>🏘️ <strong>{properties.length}</strong> pilihan hunian</div>
+            <div>💰 Mulai dari <strong>Rp {Math.min(...properties.map(p => p.price)).toLocaleString("id-ID")}</strong>/bulan</div>
+            <div>📍 Area populer: <strong>Lowokwaru, Dinoyo</strong></div>
+          </div>
+        )}
 
         {/* 🔍 Filter Bar */}
         <div className="mt-10 flex flex-wrap justify-center gap-3">
@@ -128,77 +103,76 @@ export default function PropertyShowcase({ city = "Malang" }) {
 
         {/* 🏘️ Grid Properti */}
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ scale: 1.03 }}
-              viewport={{ once: true }}
-              className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all"
-            >
-              <div className="group relative">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-56 object-cover"
-                />
-
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                  <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
-                    Lihat Detail
-                  </button>
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
-                  <h3 className="text-white text-lg font-semibold drop-shadow-sm">
-                    {item.name}
-                  </h3>
-                  <p className="text-[#f9a8d4] text-sm font-medium">{item.price}</p>
-                </div>
-              </div>
-
-              <div className="p-5 text-left">
-                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                  <MapPin size={16} /> {item.location}
-                </div>
-
-                <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-                  {item.facilities.includes("WiFi") && (
-                    <div className="flex items-center gap-1">
-                      <Wifi size={14} /> WiFi
+          {loading ? (
+            <p className="col-span-3 text-gray-500">Memuat data hunian...</p>
+          ) : filtered.length === 0 ? (
+            <p className="col-span-3 text-gray-500">Tidak ada hunian ditemukan.</p>
+          ) : (
+            filtered.map((item, index) => (
+              <Link href={`/property/${item.slug}`} key={index} className="block">
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.03 }}
+                  viewport={{ once: true }}
+                  className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all cursor-pointer"
+                >
+                  <div className="group relative">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-56 object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
+                      <h3 className="text-white text-lg font-semibold drop-shadow-sm">
+                        {item.name}
+                      </h3>
+                      <p className="text-[#f9a8d4] text-sm font-medium">
+                        Rp {item.price.toLocaleString("id-ID")}/bulan
+                      </p>
                     </div>
-                  )}
-                  {item.facilities.includes("Kamar Mandi Dalam") && (
-                    <div className="flex items-center gap-1">
-                      <Droplet size={14} /> KM Dalam
+                  </div>
+
+                  <div className="p-5 text-left">
+                    <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                      <MapPin size={16} /> {item.location}
                     </div>
-                  )}
-                  {item.facilities.includes("AC") && (
-                    <div className="flex items-center gap-1">
-                      <Bed size={14} /> AC
+
+                    <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+                      {item.facilities.includes("WiFi") && (
+                        <div className="flex items-center gap-1">
+                          <Wifi size={14} /> WiFi
+                        </div>
+                      )}
+                      {item.facilities.includes("Kamar Mandi Dalam") && (
+                        <div className="flex items-center gap-1">
+                          <Droplet size={14} /> KM Dalam
+                        </div>
+                      )}
+                      {item.facilities.includes("AC") && (
+                        <div className="flex items-center gap-1">
+                          <Bed size={14} /> AC
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+                  </div>
+                </motion.div>
+              </Link>
+            ))
+          )}
         </div>
 
         {/* 🕊️ Footer */}
-        <p className="mt-12 text-sm text-gray-500">
-          Ditemukan {filtered.length} hunian di {city} 💜
-        </p>
+        {!loading && (
+          <p className="mt-12 text-sm text-gray-500">
+            Ditemukan {filtered.length} hunian di {city} 💜
+          </p>
+        )}
       </div>
 
       {/* 🌫️ Gradient bawah lembut */}
-      {/* 🌫️ Gradient bawah lembut (nyambung ke SurveyService) */}
-{/* 🌫️ Gradient bawah lembut (nyambung ke SurveyService) */}
-<div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#f3e8ff]/90 via-[#faf5ff]/80 to-transparent pointer-events-none" />
-
-
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#f3e8ff]/90 via-[#faf5ff]/80 to-transparent pointer-events-none" />
     </section>
   );
 }

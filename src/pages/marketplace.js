@@ -4,16 +4,13 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
-  ShoppingBag,
-  HandHeart,
-  Package,
-  DollarSign,
-  ArrowLeftRight,
   SlidersHorizontal,
   MapPin,
 } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function MarketplacePage() {
   const [filter, setFilter] = useState("All");
@@ -25,6 +22,7 @@ export default function MarketplacePage() {
     {
       id: 1,
       title: "Sepeda Lipat Bekas",
+      slug: "sepeda-lipat-bekas",
       price: 750000,
       location: "Lowokwaru",
       category: "WTS",
@@ -35,6 +33,7 @@ export default function MarketplacePage() {
     {
       id: 2,
       title: "Cari Laptop Bekas",
+      slug: "cari-laptop-bekas",
       price: 5000000,
       location: "Dinoyo",
       category: "WTB",
@@ -45,6 +44,7 @@ export default function MarketplacePage() {
     {
       id: 3,
       title: "Kasur Busa - Diberikan Gratis",
+      slug: "kasur-busa-diberikan-gratis",
       price: 0,
       location: "Blimbing",
       category: "WTG",
@@ -55,6 +55,7 @@ export default function MarketplacePage() {
     {
       id: 4,
       title: "Kamera Canon 600D",
+      slug: "kamera-canon-600d",
       price: 2500000,
       location: "Tlogomas",
       category: "WTS",
@@ -65,6 +66,7 @@ export default function MarketplacePage() {
     {
       id: 5,
       title: "Ingin Tukar Helm dengan Jaket",
+      slug: "ingin-tukar-helm-dengan-jaket",
       price: 0,
       location: "Sukun",
       category: "EXCHANGE",
@@ -95,7 +97,7 @@ export default function MarketplacePage() {
     }
 
     return result;
-  }, [filter, search, sortOrder]);
+  }, [filter, search, sortOrder, items]);
 
   return (
     <>
@@ -191,62 +193,55 @@ export default function MarketplacePage() {
             {/* 🛍️ Grid barang */}
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.03 }}
-                  viewport={{ once: true }}
-                  className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all"
-                >
-                  <div className="relative group">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-56 object-cover"
-                    />
-                    <div
-                      className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${
-                        item.category === "WTS"
-                          ? "bg-green-500 text-white"
-                          : item.category === "WTB"
-                          ? "bg-blue-500 text-white"
-                          : item.category === "WTG"
-                          ? "bg-pink-500 text-white"
-                          : "bg-purple-500 text-white"
-                      }`}
-                    >
-                      {item.category}
-                    </div>
-
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                      <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
-                        Lihat Detail
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="p-5 text-left">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-gray-500 line-clamp-2">
-                      {item.desc}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-3 text-sm">
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <MapPin size={14} /> {item.location}
+                <Link key={item.id} href={`/marketplace/${item.slug}`} className="block">
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.03 }}
+                    viewport={{ once: true }}
+                    className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all cursor-pointer"
+                  >
+                    <div className="relative group">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        width={500}
+                        height={300}
+                        className="w-full h-56 object-cover"
+                      />
+                      <div
+                        className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${
+                          item.category === "WTS"
+                            ? "bg-green-500 text-white"
+                            : item.category === "WTB"
+                            ? "bg-blue-500 text-white"
+                            : item.category === "WTG"
+                            ? "bg-pink-500 text-white"
+                            : "bg-purple-500 text-white"
+                        }`}
+                      >
+                        {item.category}
                       </div>
-                      <span className="font-semibold text-[#8b5cf6]">
-                        {item.price === 0
-                          ? "Gratis"
-                          : `Rp ${item.price.toLocaleString("id-ID")}`}
-                      </span>
                     </div>
-                  </div>
-                </motion.div>
+
+                    <div className="p-5 text-left">
+                      <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+                      <p className="text-sm text-gray-500 line-clamp-2">{item.desc}</p>
+
+                      <div className="flex items-center justify-between mt-3 text-sm">
+                        <div className="flex items-center gap-1 text-gray-600">
+                          <MapPin size={14} /> {item.location}
+                        </div>
+                        <span className="font-semibold text-[#8b5cf6]">
+                          {item.price === 0
+                            ? "Gratis"
+                            : `Rp ${item.price.toLocaleString("id-ID")}`}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
 

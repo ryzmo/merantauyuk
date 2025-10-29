@@ -1,83 +1,56 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Bed, Wifi, Droplet, Search, SlidersHorizontal } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
 import Link from "next/link";
 
-
 export default function PropertyPage() {
   const [filter, setFilter] = useState("Semua");
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("default");
-
-  const properties = [
-    {
-      name: "Kos Griya Putri Anggrek",
-      price: 850000,
-      location: "Lowokwaru",
-      image: "/malang/kos1.jpg",
-      facilities: ["WiFi", "Kamar Mandi Dalam", "Dapur Bersama"],
-    },
-    {
-      name: "Kost Pak Budi",
-      price: 1200000,
-      location: "Sukun",
-      image: "/malang/kos2.jpg",
-      facilities: ["WiFi", "Air Panas", "Parkir Motor"],
-    },
-    {
-      name: "Apartemen Soekarno Hatta",
-      price: 2800000,
-      location: "Soekarno Hatta",
-      image: "/malang/kos3.jpg",
-      facilities: ["AC", "WiFi", "Laundry"],
-    },
-    {
-      name: "Kos Putra Mahasiswa UB",
-      price: 950000,
-      location: "Dinoyo",
-      image: "/malang/kos4.jpg",
-      facilities: ["WiFi", "Kamar Mandi Dalam", "Dapur Bersama"],
-    },
-    {
-      name: "Kos Green Hills",
-      price: 1500000,
-      location: "Tlogomas",
-      image: "/malang/kos5.jpg",
-      facilities: ["AC", "WiFi", "Laundry"],
-    },
-    {
-      name: "Kos Exclusive Putri Jasmine",
-      price: 2200000,
-      location: "Blimbing",
-      image: "/malang/kos6.jpg",
-      facilities: ["WiFi", "AC", "Kamar Mandi Dalam"],
-    },
-  ];
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const city = "Malang";
-  const uniqueLocations = ["Semua", ...new Set(properties.map((p) => p.location))];
+
+  // 🔄 Fetch data dari API
+  useEffect(() => {
+    async function fetchProperties() {
+      try {
+        const res = await fetch("/api/properties");
+        const data = await res.json();
+        setProperties(data);
+      } catch (error) {
+        console.error("Gagal memuat data properti:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProperties();
+  }, []);
+
+  const uniqueLocations = useMemo(() => {
+    const locs = ["Semua", ...new Set(properties.map((p) => p.location))];
+    return locs;
+  }, [properties]);
 
   // 🔍 Filter + search + sort logic
   const filtered = useMemo(() => {
     let result = [...properties];
 
-    // Filter lokasi
     if (filter !== "Semua") {
       result = result.filter((p) => p.location === filter);
     }
 
-    // Pencarian
     if (search.trim() !== "") {
       result = result.filter((p) =>
         p.name.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Urutan harga
     if (sortOrder === "asc") {
       result.sort((a, b) => a.price - b.price);
     } else if (sortOrder === "desc") {
@@ -85,7 +58,7 @@ export default function PropertyPage() {
     }
 
     return result;
-  }, [filter, search, sortOrder]);
+  }, [filter, search, sortOrder, properties]);
 
   return (
     <>
@@ -102,7 +75,7 @@ export default function PropertyPage() {
 
         {/* 🏠 Section utama */}
         <section className="relative pt-32 pb-24 px-6 max-w-6xl mx-auto text-center">
-          {/* 🌈 Background animasi lembut */}
+          {/* 🌈 Background animasi */}
           <motion.div
             className="absolute top-20 left-10 w-72 h-72 bg-[#c084fc]/30 rounded-full blur-3xl"
             animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
@@ -167,7 +140,7 @@ export default function PropertyPage() {
                 </select>
               </div>
 
-              {/* Reset button */}
+              {/* Reset */}
               <button
                 onClick={() => {
                   setFilter("Semua");
@@ -182,78 +155,85 @@ export default function PropertyPage() {
 
             {/* 📊 Info jumlah */}
             <p className="mt-4 text-sm text-gray-500">
-              Menampilkan <strong>{filtered.length}</strong> dari {properties.length} hunian
+              {loading
+                ? "Memuat data hunian..."
+                : `Menampilkan ${filtered.length} dari ${properties.length} hunian`}
             </p>
 
             {/* 🏘️ Daftar properti */}
-            {/* 🏘️ Daftar properti */}
-<div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-  {filtered.map((item, index) => {
-    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
+            <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {loading ? (
+                <p className="col-span-3 text-gray-500">Loading...</p>
+              ) : filtered.length === 0 ? (
+                <p className="col-span-3 text-gray-500">Tidak ada hasil ditemukan.</p>
+              ) : (
+                filtered.map((item, index) => {
+                  const slug = item.name.toLowerCase().replace(/\s+/g, "-");
+                  return (
+                    <Link
+                      key={index}
+                      href={`/property/${slug}`}
+                      className="group relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all block"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: index * 0.1 }}
+                        whileHover={{ scale: 1.03 }}
+                        viewport={{ once: true }}
+                        className="h-full"
+                      >
+                        <div className="relative">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
+                            <h3 className="text-white text-lg font-semibold drop-shadow-sm">
+                              {item.name}
+                            </h3>
+                            <p className="text-[#f9a8d4] text-sm font-medium">
+                              Rp {item.price.toLocaleString("id-ID")}/bulan
+                            </p>
+                          </div>
+                        </div>
 
-    return (
-      <Link
-        key={index}
-        href={`/property/${slug}`}
-        className="group relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all block"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: index * 0.1 }}
-          whileHover={{ scale: 1.03 }}
-          viewport={{ once: true }}
-          className="h-full"
-        >
-          <div className="relative">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
-              <h3 className="text-white text-lg font-semibold drop-shadow-sm">
-                {item.name}
-              </h3>
-              <p className="text-[#f9a8d4] text-sm font-medium">
-                Rp {item.price.toLocaleString("id-ID")}/bulan
+                        <div className="p-5 text-left">
+                          <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                            <MapPin size={16} /> {item.location}
+                          </div>
+
+                          <div className="flex flex-wrap gap-3 text-xs text-gray-600">
+                            {item.facilities.includes("WiFi") && (
+                              <div className="flex items-center gap-1">
+                                <Wifi size={14} /> WiFi
+                              </div>
+                            )}
+                            {item.facilities.includes("Kamar Mandi Dalam") && (
+                              <div className="flex items-center gap-1">
+                                <Droplet size={14} /> KM Dalam
+                              </div>
+                            )}
+                            {item.facilities.includes("AC") && (
+                              <div className="flex items-center gap-1">
+                                <Bed size={14} /> AC
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+
+            {!loading && (
+              <p className="mt-12 text-sm text-gray-500">
+                Ditemukan {filtered.length} hunian di {city} 💜
               </p>
-            </div>
-          </div>
-
-          <div className="p-5 text-left">
-            <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-              <MapPin size={16} /> {item.location}
-            </div>
-
-            <div className="flex flex-wrap gap-3 text-xs text-gray-600">
-              {item.facilities.includes("WiFi") && (
-                <div className="flex items-center gap-1">
-                  <Wifi size={14} /> WiFi
-                </div>
-              )}
-              {item.facilities.includes("Kamar Mandi Dalam") && (
-                <div className="flex items-center gap-1">
-                  <Droplet size={14} /> KM Dalam
-                </div>
-              )}
-              {item.facilities.includes("AC") && (
-                <div className="flex items-center gap-1">
-                  <Bed size={14} /> AC
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-      </Link>
-    );
-  })}
-</div>
-
-
-            <p className="mt-12 text-sm text-gray-500">
-              Ditemukan {filtered.length} hunian di {city} 💜
-            </p>
+            )}
           </div>
         </section>
 

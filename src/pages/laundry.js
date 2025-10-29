@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Clock, Shirt, DollarSign, Search, SlidersHorizontal } from "lucide-react";
+import { MapPin, Shirt, Search, SlidersHorizontal } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LaundryPage() {
   const [filter, setFilter] = useState("Semua");
@@ -14,42 +15,54 @@ export default function LaundryPage() {
 
   const laundries = [
     {
+      id: 1,
       name: "Laundry Express UB",
+      slug: "laundry-express-ub",
       price: 7000,
       location: "Lowokwaru",
       image: "/laundry/laundry1.jpg",
       services: ["Cuci + Setrika", "Antar Jemput", "Express 6 Jam"],
     },
     {
+      id: 2,
       name: "Quick Wash Dinoyo",
+      slug: "quick-wash-dinoyo",
       price: 6000,
       location: "Dinoyo",
       image: "/laundry/laundry2.jpg",
       services: ["Cuci Kering", "Setrika", "Cuci Sepatu"],
     },
     {
+      id: 3,
       name: "Cahaya Laundry Blimbing",
+      slug: "cahaya-laundry-blimbing",
       price: 8000,
       location: "Blimbing",
       image: "/laundry/laundry3.jpg",
       services: ["Cuci Basah", "Antar Jemput", "Express"],
     },
     {
+      id: 4,
       name: "Eco Clean Laundry",
+      slug: "eco-clean-laundry",
       price: 5500,
       location: "Sukun",
       image: "/laundry/laundry4.jpg",
       services: ["Cuci Kering", "Setrika", "Cuci Karpet"],
     },
     {
+      id: 5,
       name: "Smart Laundry Tlogomas",
+      slug: "smart-laundry-tlogomas",
       price: 6500,
       location: "Tlogomas",
       image: "/laundry/laundry5.jpg",
       services: ["Cuci + Setrika", "Express 1 Hari"],
     },
     {
+      id: 6,
       name: "Perfect Clean Soehat",
+      slug: "perfect-clean-soehat",
       price: 9000,
       location: "Soekarno Hatta",
       image: "/laundry/laundry6.jpg",
@@ -60,28 +73,19 @@ export default function LaundryPage() {
   const city = "Malang";
   const uniqueLocations = ["Semua", ...new Set(laundries.map((l) => l.location))];
 
-  // 🔍 Filter, search, dan sort
   const filtered = useMemo(() => {
     let result = [...laundries];
 
-    if (filter !== "Semua") {
-      result = result.filter((l) => l.location === filter);
-    }
-
-    if (search.trim() !== "") {
+    if (filter !== "Semua") result = result.filter((l) => l.location === filter);
+    if (search.trim() !== "")
       result = result.filter((l) =>
         l.name.toLowerCase().includes(search.toLowerCase())
       );
-    }
-
-    if (sortOrder === "asc") {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortOrder === "desc") {
-      result.sort((a, b) => b.price - a.price);
-    }
+    if (sortOrder === "asc") result.sort((a, b) => a.price - b.price);
+    else if (sortOrder === "desc") result.sort((a, b) => b.price - a.price);
 
     return result;
-  }, [filter, search, sortOrder]);
+  }, [filter, search, sortOrder, laundries]);
 
   return (
     <>
@@ -125,7 +129,6 @@ export default function LaundryPage() {
 
             {/* 🔍 Search & Filter Bar */}
             <div className="mt-10 bg-white/70 backdrop-blur-md border border-[#8b5cf6]/20 rounded-2xl p-5 shadow-sm flex flex-wrap justify-center gap-4 items-center">
-              {/* Search bar */}
               <div className="flex items-center bg-white border border-gray-200 rounded-full px-4 py-2 w-full sm:w-72">
                 <Search size={18} className="text-gray-400 mr-2" />
                 <input
@@ -137,18 +140,16 @@ export default function LaundryPage() {
                 />
               </div>
 
-              {/* Filter lokasi */}
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="border border-gray-200 rounded-full px-4 py-2 text-sm bg-white text-gray-700 focus:ring-2 focus:ring-[#8b5cf6] transition"
+                className="border border-gray-200 rounded-full px-4 py-2 text-sm bg-white text-gray-700 focus:ring-2 focus:ring-[#8b5cf6]"
               >
                 {uniqueLocations.map((loc) => (
                   <option key={loc}>{loc}</option>
                 ))}
               </select>
 
-              {/* Sort harga */}
               <div className="flex items-center gap-2 text-sm">
                 <SlidersHorizontal size={16} className="text-[#8b5cf6]" />
                 <select
@@ -162,7 +163,6 @@ export default function LaundryPage() {
                 </select>
               </div>
 
-              {/* Reset button */}
               <button
                 onClick={() => {
                   setFilter("Semua");
@@ -175,7 +175,6 @@ export default function LaundryPage() {
               </button>
             </div>
 
-            {/* 📊 Info jumlah */}
             <p className="mt-4 text-sm text-gray-500">
               Menampilkan <strong>{filtered.length}</strong> dari {laundries.length} laundry
             </p>
@@ -183,55 +182,51 @@ export default function LaundryPage() {
             {/* 🧺 Grid daftar laundry */}
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filtered.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.03 }}
-                  viewport={{ once: true }}
-                  className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all"
-                >
-                  <div className="group relative">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-56 object-cover"
-                    />
-
-                    <Link href={`/laundry/${item.name.toLowerCase().replace(/\s+/g, "-")}`}>
-  <button className="px-4 py-2 bg-white/80 text-[#8b5cf6] font-medium rounded-lg shadow-md hover:bg-white transition-all">
-    Lihat Detail
-  </button>
-</Link>
-
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
-                      <h3 className="text-white text-lg font-semibold drop-shadow-sm">
-                        {item.name}
-                      </h3>
-                      <p className="text-[#f9a8d4] text-sm font-medium">
-                        Rp {item.price.toLocaleString("id-ID")} / kg
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-5 text-left">
-                    <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                      <MapPin size={16} /> {item.location}
+                <Link key={item.id} href={`/laundry/${item.slug}`} className="block">
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.03 }}
+                    viewport={{ once: true }}
+                    className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all cursor-pointer"
+                  >
+                    <div className="group relative">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={500}
+                        height={300}
+                        className="w-full h-56 object-cover"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-left">
+                        <h3 className="text-white text-lg font-semibold drop-shadow-sm">
+                          {item.name}
+                        </h3>
+                        <p className="text-[#f9a8d4] text-sm font-medium">
+                          Rp {item.price.toLocaleString("id-ID")} / kg
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 text-xs text-gray-600">
-                      {item.services.map((svc, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-1 bg-[#f3e8ff]/60 px-2 py-1 rounded-full"
-                        >
-                          <Shirt size={12} /> {svc}
-                        </div>
-                      ))}
+                    <div className="p-5 text-left">
+                      <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
+                        <MapPin size={16} /> {item.location}
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                        {item.services.map((svc, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center gap-1 bg-[#f3e8ff]/60 px-2 py-1 rounded-full"
+                          >
+                            <Shirt size={12} /> {svc}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
 

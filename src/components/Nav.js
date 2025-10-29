@@ -9,6 +9,7 @@ export default function Nav() {
   // 🔹 Tambah item "About"
   const items = [
     ["Beranda", "/"],
+    ["Profil", "/profile"],
     ["Kos", "/property"],
     ["Survei", "/survei"],
     ["Laundry", "/laundry"],

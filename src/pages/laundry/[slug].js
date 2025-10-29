@@ -165,8 +165,8 @@ export default function LaundryDetailPage() {
               </h3>
               <ul className="list-disc list-inside text-gray-700 space-y-1">
                 {laundry.rules.map((rule, i) => (
-                  <li key={i}>{rule}</li>
-                ))}
+  <li key={i}>{rule}</li>  // ✅ tambahkan key
+))}
               </ul>
             </div>
           )}
