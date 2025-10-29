@@ -1,82 +1,37 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  Search,
-  SlidersHorizontal,
-  MapPin,
-} from "lucide-react";
+import { Search, SlidersHorizontal, MapPin } from "lucide-react";
 import Head from "next/head";
 import Navbar from "../components/Nav";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function MarketplacePage() {
+  const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
-
-  // 📦 contoh data dummy marketplace
-  const items = [
-    {
-      id: 1,
-      title: "Sepeda Lipat Bekas",
-      slug: "sepeda-lipat-bekas",
-      price: 750000,
-      location: "Lowokwaru",
-      category: "WTS",
-      image: "/market/bike.jpg",
-      desc: "Sepeda lipat kondisi 90%, jarang dipakai. Siap pakai!",
-      date: "2025-10-15",
-    },
-    {
-      id: 2,
-      title: "Cari Laptop Bekas",
-      slug: "cari-laptop-bekas",
-      price: 5000000,
-      location: "Dinoyo",
-      category: "WTB",
-      image: "/market/laptop.jpg",
-      desc: "Saya mencari laptop second dengan RAM minimal 8GB.",
-      date: "2025-10-10",
-    },
-    {
-      id: 3,
-      title: "Kasur Busa - Diberikan Gratis",
-      slug: "kasur-busa-diberikan-gratis",
-      price: 0,
-      location: "Blimbing",
-      category: "WTG",
-      image: "/market/mattress.jpg",
-      desc: "Kasur bekas tapi masih layak. Ambil sendiri ke rumah.",
-      date: "2025-10-18",
-    },
-    {
-      id: 4,
-      title: "Kamera Canon 600D",
-      slug: "kamera-canon-600d",
-      price: 2500000,
-      location: "Tlogomas",
-      category: "WTS",
-      image: "/market/camera.jpg",
-      desc: "Kamera DSLR second, kondisi masih bagus, include lensa kit.",
-      date: "2025-10-14",
-    },
-    {
-      id: 5,
-      title: "Ingin Tukar Helm dengan Jaket",
-      slug: "ingin-tukar-helm-dengan-jaket",
-      price: 0,
-      location: "Sukun",
-      category: "EXCHANGE",
-      image: "/market/helmet.jpg",
-      desc: "WTG/WTT: tukar helm half-face dengan jaket kulit.",
-      date: "2025-10-12",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
 
   const categories = ["All", "WTS", "WTB", "WTG", "EXCHANGE"];
+
+  // 🔄 Fetch data dari API marketplace
+  useEffect(() => {
+    async function fetchItems() {
+      try {
+        const res = await fetch("/api/marketplace");
+        const data = await res.json();
+        setItems(data);
+      } catch (error) {
+        console.error("Gagal memuat data marketplace:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchItems();
+  }, []);
 
   // 🔍 Filter, search, dan sort logic
   const filtered = useMemo(() => {
@@ -187,69 +142,79 @@ export default function MarketplacePage() {
 
             {/* 📊 Info jumlah */}
             <p className="mt-4 text-sm text-gray-500">
-              Menampilkan <strong>{filtered.length}</strong> dari {items.length} barang
+              {loading
+                ? "Memuat data marketplace..."
+                : `Menampilkan ${filtered.length} dari ${items.length} barang`}
             </p>
 
             {/* 🛍️ Grid barang */}
             <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filtered.map((item, index) => (
-                <Link key={item.id} href={`/marketplace/${item.slug}`} className="block">
-                  <motion.div
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                    whileHover={{ scale: 1.03 }}
-                    viewport={{ once: true }}
-                    className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all cursor-pointer"
-                  >
-                    <div className="relative group">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={500}
-                        height={300}
-                        className="w-full h-56 object-cover"
-                      />
-                      <div
-                        className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${
-                          item.category === "WTS"
-                            ? "bg-green-500 text-white"
-                            : item.category === "WTB"
-                            ? "bg-blue-500 text-white"
-                            : item.category === "WTG"
-                            ? "bg-pink-500 text-white"
-                            : "bg-purple-500 text-white"
-                        }`}
-                      >
-                        {item.category}
-                      </div>
-                    </div>
-
-                    <div className="p-5 text-left">
-                      <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                      <p className="text-sm text-gray-500 line-clamp-2">{item.desc}</p>
-
-                      <div className="flex items-center justify-between mt-3 text-sm">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <MapPin size={14} /> {item.location}
+              {loading ? (
+                <p className="col-span-3 text-gray-500">Sedang memuat data...</p>
+              ) : filtered.length === 0 ? (
+                <p className="col-span-3 text-gray-500">
+                  Tidak ada barang yang cocok dengan filter.
+                </p>
+              ) : (
+                filtered.map((item, index) => (
+                  <Link key={item.id} href={`/marketplace/${item.slug}`} className="block">
+                    <motion.div
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.03 }}
+                      viewport={{ once: true }}
+                      className="relative bg-white/70 backdrop-blur-lg border border-[#8b5cf6]/20 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_25px_rgba(139,92,246,0.25)] transition-all cursor-pointer"
+                    >
+                      <div className="relative group">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          width={500}
+                          height={300}
+                          className="w-full h-56 object-cover"
+                        />
+                        <div
+                          className={`absolute top-3 left-3 text-xs font-semibold px-3 py-1 rounded-full ${
+                            item.category === "WTS"
+                              ? "bg-green-500 text-white"
+                              : item.category === "WTB"
+                              ? "bg-blue-500 text-white"
+                              : item.category === "WTG"
+                              ? "bg-pink-500 text-white"
+                              : "bg-purple-500 text-white"
+                          }`}
+                        >
+                          {item.category}
                         </div>
-                        <span className="font-semibold text-[#8b5cf6]">
-                          {item.price === 0
-                            ? "Gratis"
-                            : `Rp ${item.price.toLocaleString("id-ID")}`}
-                        </span>
                       </div>
-                    </div>
-                  </motion.div>
-                </Link>
-              ))}
+
+                      <div className="p-5 text-left">
+                        <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
+                        <p className="text-sm text-gray-500 line-clamp-2">{item.desc}</p>
+
+                        <div className="flex items-center justify-between mt-3 text-sm">
+                          <div className="flex items-center gap-1 text-gray-600">
+                            <MapPin size={14} /> {item.location}
+                          </div>
+                          <span className="font-semibold text-[#8b5cf6]">
+                            {item.price === 0
+                              ? "Gratis"
+                              : `Rp ${item.price.toLocaleString("id-ID")}`}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </Link>
+                ))
+              )}
             </div>
 
-            <p className="mt-12 text-sm text-gray-500">
-              {filtered.length > 0
-                ? `Ditemukan ${filtered.length} barang di Marketplace 💜`
-                : "Tidak ada barang yang cocok dengan filter."}
-            </p>
+            {!loading && (
+              <p className="mt-12 text-sm text-gray-500">
+                Ditemukan {filtered.length} barang di Marketplace 💜
+              </p>
+            )}
           </div>
         </section>
 

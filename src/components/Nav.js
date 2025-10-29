@@ -16,6 +16,7 @@ export default function Nav() {
     ["Marketplace", "/marketplace"],
     ["Bantuan", "/bantuan"],
     ["Tentang", "/tentang"], // ✅ new link
+    ["Gabung", "/gabung"], // ✅ new link
   ];
 
   useEffect(() => {
@@ -90,7 +91,7 @@ export default function Nav() {
 
           {/* 🔹 Tombol CTA */}
           <a
-            href="#cta"
+            href="/login"
             className="rounded-full text-sm font-semibold text-white px-5 py-2 shadow-md transition-all duration-300"
             style={{
               background:
