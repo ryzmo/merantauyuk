@@ -6,9 +6,42 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // 🧩 Fungsi untuk handle login
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Login gagal");
+      } else {
+        // Simpan token ke localStorage
+        localStorage.setItem("token", data.token);
+        alert("Login berhasil! Selamat datang kembali 💜");
+        window.location.href = "/"; // redirect
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Terjadi kesalahan server.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-[#faf5ff] via-[#f3e8ff] to-white">
+    <div className="min-h-screen flex text-black flex-col md:flex-row bg-gradient-to-br from-[#faf5ff] via-[#f3e8ff] to-white">
       {/* ✅ Left Section - Image */}
       <div className="hidden md:flex w-1/2 items-center justify-center p-10">
         <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-lg">
@@ -18,9 +51,7 @@ export default function LoginPage() {
             className="w-full h-[520px] object-cover"
           />
           <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/50 to-transparent text-white">
-            <h3 className="text-lg font-semibold">
-              Jelajahi Kota Impianmu 🌆
-            </h3>
+            <h3 className="text-lg font-semibold">Jelajahi Kota Impianmu 🌆</h3>
             <p className="text-sm text-gray-200">
               Temukan hunian dan komunitas terbaik untuk perantau.
             </p>
@@ -49,11 +80,13 @@ export default function LoginPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleLogin}>
             {/* Email */}
             <div>
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukkan Email"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
                 required
@@ -64,6 +97,8 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Masukkan Kata Sandi"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
                 required
@@ -97,14 +132,17 @@ export default function LoginPage() {
             {/* Tombol Login */}
             <button
               type="submit"
-              className="w-full rounded-full py-2.5 font-semibold text-white transition-all shadow-md hover:shadow-lg"
+              disabled={loading}
+              className={`w-full rounded-full py-2.5 font-semibold text-white transition-all shadow-md hover:shadow-lg ${
+                loading ? "opacity-60 cursor-not-allowed" : ""
+              }`}
               style={{
                 background:
                   "linear-gradient(to right, #f9a8d4, #c084fc, #93c5fd)",
                 boxShadow: "0 4px 20px rgba(192,132,252,0.4)",
               }}
             >
-              Masuk
+              {loading ? "Memproses..." : "Masuk"}
             </button>
           </form>
 

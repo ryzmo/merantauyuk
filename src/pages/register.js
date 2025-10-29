@@ -3,10 +3,67 @@
 import { useState } from "react";
 import { Eye, EyeOff, Home } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = new FormData(e.target);
+    const data = Object.fromEntries(form.entries());
+
+    if (data.password !== data.confirmPassword) {
+      alert("Kata sandi dan konfirmasi tidak cocok!");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          status: data.status,
+          password: data.password,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        // ✅ Simpan data sementara ke localStorage agar bisa dikirim ke verify-otp
+        localStorage.setItem(
+          "pendingUser",
+          JSON.stringify({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            status: data.status,
+            password: data.password,
+          })
+        );
+
+        alert("Kode OTP telah dikirim ke email Anda!");
+        router.push(`/verify?email=${encodeURIComponent(data.email)}`);
+      } else {
+        alert(result.message || "Terjadi kesalahan, coba lagi.");
+      }
+    } catch (err) {
+      console.error("Register error:", err);
+      alert("Gagal mengirim data registrasi.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen text-black flex flex-col md:flex-row bg-gradient-to-br from-[#faf5ff] via-[#f3e8ff] to-white">
@@ -14,7 +71,7 @@ export default function RegisterPage() {
       <div className="hidden md:flex w-1/2 items-center justify-center p-10">
         <div className="relative w-full max-w-md rounded-3xl overflow-hidden shadow-lg">
           <img
-            src="/siluet3.jpg" // ganti sesuai foto lain biar beda dari login
+            src="/siluet3.jpg"
             alt="Suasana Kota"
             className="w-full h-[520px] object-cover"
           />
@@ -46,10 +103,10 @@ export default function RegisterPage() {
           </div>
 
           {/* Form */}
-          <form className="space-y-5">
-            {/* Nama */}
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <input
+                name="name"
                 type="text"
                 placeholder="Nama Lengkap"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
@@ -57,9 +114,9 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Email */}
             <div>
               <input
+                name="email"
                 type="email"
                 placeholder="Alamat Email"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
@@ -67,9 +124,34 @@ export default function RegisterPage() {
               />
             </div>
 
+            <div>
+              <input
+                name="phone"
+                type="tel"
+                placeholder="Nomor Telepon"
+                className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
+                required
+              />
+            </div>
+
+            <div>
+              <select
+                name="status"
+                required
+                className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 text-gray-700 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
+              >
+                <option value="">Pilih Status</option>
+                <option value="mahasiswa">Mahasiswa</option>
+                <option value="pekerja">Pekerja</option>
+                <option value="pelajar">Pelajar</option>
+                <option value="lainnya">Lainnya</option>
+              </select>
+            </div>
+
             {/* Password */}
             <div className="relative">
               <input
+                name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Kata Sandi"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
@@ -84,9 +166,10 @@ export default function RegisterPage() {
               </button>
             </div>
 
-            {/* Konfirmasi Password */}
+            {/* Confirm Password */}
             <div className="relative">
               <input
+                name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Ulangi Kata Sandi"
                 className="w-full border border-[#c084fc]/30 rounded-full px-4 py-2.5 text-sm bg-white/70 focus:ring-2 focus:ring-[#c084fc]/30 focus:border-[#8b5cf6] outline-none transition-all"
@@ -119,17 +202,20 @@ export default function RegisterPage() {
               </span>
             </div>
 
-            {/* Tombol Register */}
+            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full rounded-full py-2.5 font-semibold text-white transition-all shadow-md hover:shadow-lg"
+              disabled={loading}
+              className={`w-full rounded-full py-2.5 font-semibold text-white transition-all shadow-md hover:shadow-lg ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
               style={{
                 background:
                   "linear-gradient(to right, #f9a8d4, #c084fc, #93c5fd)",
                 boxShadow: "0 4px 20px rgba(192,132,252,0.4)",
               }}
             >
-              Daftar Sekarang
+              {loading ? "Mengirim..." : "Daftar Sekarang"}
             </button>
           </form>
 
@@ -140,13 +226,11 @@ export default function RegisterPage() {
             <div className="flex-grow border-t border-[#c084fc]/20" />
           </div>
 
-          {/* Google Register */}
           <button className="w-full border border-[#c084fc]/30 rounded-full py-2 flex items-center justify-center gap-2 text-sm text-gray-700 bg-white/60 hover:bg-[#faf5ff]/70 transition-all">
             <img src="/google.svg" alt="Google" className="w-5 h-5" />
             Daftar dengan Google
           </button>
 
-          {/* Sudah punya akun */}
           <p className="text-sm text-gray-600 text-center mt-6">
             Sudah punya akun?{" "}
             <Link

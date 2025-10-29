@@ -90,7 +90,7 @@ export default function Nav() {
           })}
 
           {/* 🔹 Tombol CTA */}
-          <a
+          <Link
             href="/login"
             className="rounded-full text-sm font-semibold text-white px-5 py-2 shadow-md transition-all duration-300"
             style={{
@@ -108,7 +108,7 @@ export default function Nav() {
             }
           >
             Login
-          </a>
+          </Link>
         </div>
       </nav>
     </header>
