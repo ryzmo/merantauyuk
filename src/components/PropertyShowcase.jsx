@@ -69,14 +69,9 @@ export default function PropertyShowcase({ city = "Malang" }) {
           Temukan tempat tinggal sesuai gaya hidupmu.
         </p>
 
-        <p className="mt-4 text-[#8b5cf6] font-medium tracking-wide">
-          Pilihan kos & apartemen paling populer bulan ini ✨
-        </p>
-
         {/* 📊 Statistik mini */}
         {!loading && properties.length > 0 && (
           <div className="mt-8 flex justify-center gap-6 text-sm text-gray-600">
-            <div>🏘️ <strong>{properties.length}</strong> pilihan hunian</div>
             <div>💰 Mulai dari <strong>Rp {Math.min(...properties.map(p => p.price)).toLocaleString("id-ID")}</strong>/bulan</div>
             <div>📍 Area populer: <strong>Lowokwaru, Dinoyo</strong></div>
           </div>
@@ -162,13 +157,6 @@ export default function PropertyShowcase({ city = "Malang" }) {
             ))
           )}
         </div>
-
-        {/* 🕊️ Footer */}
-        {!loading && (
-          <p className="mt-12 text-sm text-gray-500">
-            Ditemukan {filtered.length} hunian di {city} 💜
-          </p>
-        )}
       </div>
 
       {/* 🌫️ Gradient bawah lembut */}
