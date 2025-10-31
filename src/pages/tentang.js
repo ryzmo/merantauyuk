@@ -2,12 +2,14 @@
 
 import { motion } from "framer-motion";
 import { Heart, Home, Users, Target, Sparkles } from "lucide-react";
+import Header from "../components/Nav";
 
 export default function TentangPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#faf5ff]/80 via-[#f3e8ff]/80 to-white text-gray-800">
       {/* 🌈 Hero Section */}
-      <section className="relative text-center py-20 overflow-hidden">
+      <Header />
+      <section className="relative text-center py-25 overflow-hidden">
         <motion.div
           className="absolute top-20 left-10 w-80 h-80 bg-[#c084fc]/25 rounded-full blur-3xl"
           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}

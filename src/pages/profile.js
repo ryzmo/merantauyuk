@@ -1,5 +1,5 @@
 "use client";
-
+import Header from "../components/Nav";
 import { motion } from "framer-motion";
 import {
   User,
@@ -12,20 +12,13 @@ import {
   LogOut,
   Clock,
   Shield,
-  Moon,
-  Sun,
   Building2,
   ShoppingBag,
   Droplet,
-  BedDouble,
 } from "lucide-react";
-import { useState } from "react";
-import Link from "next/link";
 import Head from "next/head";
 
 export default function ProfilePage() {
-  const [darkMode, setDarkMode] = useState(false);
-
   const user = {
     name: "Farhan Rahman",
     email: "farhan@example.com",
@@ -103,15 +96,11 @@ export default function ProfilePage() {
         />
       </Head>
 
-      <main
-        className={`min-h-screen transition-all duration-500 ${
-          darkMode
-            ? "bg-gradient-to-b from-[#1f1b2e] via-[#2a2440] to-[#3b2f60] text-gray-100"
-            : "bg-gradient-to-b from-white via-[#faf5ff]/80 to-[#f3e8ff]/60 text-gray-800"
-        } p-6 md:p-12`}
-      >
+      <main className="min-h-screen bg-gradient-to-b from-white via-[#faf5ff]/80 to-[#f3e8ff]/60 text-gray-800 p-6 md:p-12">
+        <Header />
+
         {/* 🧭 Header Section */}
-        <div className="max-w-6xl mx-auto mb-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+        <div className="max-w-6xl mt-15 mx-auto mb-10 flex flex-col md:flex-row items-center md:items-start gap-8">
           <motion.img
             src={user.avatar}
             alt="User Avatar"
@@ -121,9 +110,7 @@ export default function ProfilePage() {
             transition={{ duration: 0.6 }}
           />
           <div>
-            <h1 className="text-3xl font-bold text-[#8b5cf6]">
-              {user.name}
-            </h1>
+            <h1 className="text-3xl font-bold text-[#8b5cf6]">{user.name}</h1>
             <p className="text-gray-500 mt-1">{user.bio}</p>
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               <p className="flex items-center gap-2">
@@ -140,17 +127,6 @@ export default function ProfilePage() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* ⚙️ Mode & Pengaturan */}
-        <div className="max-w-6xl mx-auto flex justify-end mb-8">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm hover:bg-white/10 transition"
-          >
-            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-            {darkMode ? "Mode Terang" : "Mode Gelap"}
-          </button>
         </div>
 
         {/* 🧾 Aktivitas Terbaru */}
