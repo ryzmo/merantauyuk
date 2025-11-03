@@ -17,6 +17,7 @@ import {
   Droplet,
 } from "lucide-react";
 import Head from "next/head";
+import FooterElegant from "@/components/Footer";
 
 export default function ProfilePage() {
   const user = {
@@ -96,7 +97,8 @@ export default function ProfilePage() {
         />
       </Head>
 
-      <main className="min-h-screen bg-gradient-to-b from-white via-[#faf5ff]/80 to-[#f3e8ff]/60 text-gray-800 p-6 md:p-12">
+      <main>
+        <div className="min-h-screen bg-gradient-to-b from-white via-[#faf5ff]/80 to-[#f3e8ff]/60 text-gray-800 p-6 md:p-12">
         <Header />
 
         {/* 🧭 Header Section */}
@@ -251,10 +253,11 @@ export default function ProfilePage() {
         </motion.section>
 
         {/* 🦶 Footer */}
-        <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-500 bg-white/60 backdrop-blur-md">
-          © {new Date().getFullYear()} MerantauYuk. Semua Hak Dilindungi 💜
-        </footer>
+        
+      </div>
+      <FooterElegant />
       </main>
+      
     </>
   );
 }

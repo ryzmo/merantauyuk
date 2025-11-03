@@ -13,6 +13,7 @@ export default function Nav() {
   const items = [
     ["Beranda", "/"],
     ["Profil", "/profile"],
+    ["Riwayat", "/history"],
     ["Kos", "/property"],
     ["Survei", "/survei"],
     ["Laundry", "/laundry"],

@@ -6,6 +6,7 @@ import { MapPin, Bed, Wifi, Droplet, Search, SlidersHorizontal } from "lucide-re
 import Head from "next/head";
 import Navbar from "../components/Nav";
 import Link from "next/link";
+import FooterElegant from "@/components/Footer";
 
 export default function PropertyPage() {
   const [filter, setFilter] = useState("Semua");
@@ -237,9 +238,7 @@ export default function PropertyPage() {
           </div>
         </section>
 
-        <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-500 bg-white/70 backdrop-blur-md">
-          © {new Date().getFullYear()} MerantauYuk. All rights reserved.
-        </footer>
+        <FooterElegant />
       </main>
     </>
   );

@@ -7,6 +7,7 @@ import Head from "next/head";
 import Navbar from "../components/Nav";
 import Link from "next/link";
 import Image from "next/image";
+import FooterElegant from "@/components/Footer";
 
 export default function MarketplacePage() {
   const [items, setItems] = useState([]);
@@ -218,9 +219,7 @@ export default function MarketplacePage() {
           </div>
         </section>
 
-        <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-500 bg-white/70 backdrop-blur-md">
-          © {new Date().getFullYear()} MerantauYuk. All rights reserved.
-        </footer>
+        <FooterElegant />
       </main>
     </>
   );
