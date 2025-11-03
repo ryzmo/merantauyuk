@@ -7,6 +7,7 @@ import SurveyService from "@/components/Survey";
 import CityMapSection from "@/components/CityMapSection";
 import FeatureCTASection from "@/components/FeatureCTASection";
 import FooterElegant from "@/components/Footer";
+import ChatAIMerantauYuk from "./ai-merantau-yuk";
 
 export default function Home() {
   console.log({
@@ -35,6 +36,7 @@ export default function Home() {
       <CityMapSection />
       <FeatureCTASection />
       <FooterElegant />
+      <ChatAIMerantauYuk />
 
       
     </div>

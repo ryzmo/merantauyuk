@@ -20,7 +20,7 @@ export default function Nav() {
     ["Marketplace", "/marketplace"],
     ["Bantuan", "/bantuan"],
     ["Tentang", "/tentang"],
-    ["Gabung", "/gabung"],
+    ["Mitra", "/gabung"],
   ];
 
   // 🧠 Hide navbar saat scroll
